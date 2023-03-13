@@ -1,0 +1,28 @@
+<h1 class="mt-4">Admin Dashboard</h1>
+<br>
+<h5>Hello and Welcome <strong><%= adminFirstName %></strong>!</h5>
+<br>
+<h5 style="color: rgb(76, 76, 255); margin-bottom: 15px;">Admin Info:</h5>
+<div style="border: dashed 2px lightblue; border-radius: 5px; padding: 15px; margin: 20px 0px 0px 0px; max-width: 600px;">
+    <p class="lead mb-3">Name: <strong><%= adminData.name %></strong></p>
+    <p class="lead mb-3">User ID: <strong><%= adminData.id %></strong></p>
+    <p class="lead mb-3">Session ID: <strong><%= adminSessionId %></strong></p>
+    <a href="/auth/logout" class="btn btn-secondary">Logout</a>
+</div>
+<br><br>
+
+<h5 style="color: red; margin-bottom: 15px;">ALL Current Active Sessions:</h5>
+<% for( let i = 0; i < iDs.length; i++ ) { %>
+    <% activeSessionIds.forEach(sid => { %>
+        <% if (iDs[i].sessionId == sid) { %>
+            <div style="border: solid 2px lightgray; border-radius: 5px; padding: 15px; margin: 20px 0px 0px 0px; max-width: 600px;">
+                <p class="lead mb-3">Session ID: <strong><%= sid %></strong></p>
+                <p class="lead mb-3">User ID: <strong><%= iDs[i].userId %></strong></p>
+                <a href="/revoke?sid=<%= sid %>">Revoke Session</a>
+            </div>  
+        <% } %>  
+    <% }) %>
+<% } %>
+
+
+<br><br>
