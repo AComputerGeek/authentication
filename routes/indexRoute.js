@@ -16,8 +16,10 @@ router.get("/", (req, res) => {
 });
 
 // Dashboard Rout:
+// 
+// User Dashboard:
 // URL: "localhost:8000/dashboard"
-// The only person can see this page (dashboard page) is the person who is logged in.
+// The only person can see this page (dashboard page) is the person who is logged in (this person is not admin!).
 // 
 // NOTE: For protecting a page from an invalid user, 
 // we should use ensureAuthenticated function to check user's authorization.
@@ -34,58 +36,53 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
   }
 });
 
-// Admin Panel
+// Admin Dashboard:
 router.get("/admin", isAdmin, (req, res) => {
 
   // Session Store:
-  const activeSessionIds  = Object.keys(req.sessionStore.sessions);
-  const allActiveSessions = Object.values(req.sessionStore.sessions);
+  const activeSessionIds  = Object.keys(req.sessionStore.sessions); // All Keys in the Session Store (All Active Session IDs) as an array
+  const allActiveSessions = Object.values(req.sessionStore.sessions); // All Values related to Active Session IDs as an array
 
-
+  // Making match between User ID and Session ID, and push each match as an object to an array
   const iDs = [];
 
-  for (let i = 0; i < Object.values(req.sessionStore.sessions).length; i++) 
+  for(let i = 0; i < allActiveSessions.length; i++) 
   {
-    for (let j = 0; j < activeSessionIds.length; j++) 
+    for(let j = 0; j < activeSessionIds.length; j++) 
     {
       if(i == j)
       {
-        let userId    = JSON.parse(Object.values(req.sessionStore.sessions)[i]).passport.user;
+        let userId    = JSON.parse(allActiveSessions[i]).passport.user; // First, convert string to an object by JSON.parse(" "); and then extract user's id from that object
         let sessionId = activeSessionIds[i];
+
         iDs.push({ "userId": userId, "sessionId": sessionId }); 
       }
     }
   }
 
-  console.log("iDs:", iDs);
+  console.log(`${os.EOL}===>>> iDs:`, iDs); // [ { userId: X1, sessionId: Y1 }, { userId: X2, sessionId: Y2 }, ... ]
 
-
-
- 
-
-
-  console.log(`${os.EOL}===>>> \"req.sessionStore.sessions\" - The Session Store (All Active Sessions):`, req.sessionStore.sessions); // Session Store (All Active Sessions)
-  console.log(`===>>> \"Object.keys(req.sessionStore.sessions)\" - All Keys in the Session Store (All Active Session IDs) as an array:`, Object.keys(req.sessionStore.sessions)); // All Active Session IDs as an array
+  // Info about Session Store:
+  console.log(`${os.EOL}===>>> \"req.sessionStore.sessions\" - All Active Sessions in the Session Store:`, req.sessionStore.sessions); // All Active Sessions in the Session Store
+  console.log(`===>>> \"Object.keys(req.sessionStore.sessions)\" - All Keys (All Active Session IDs) in the Session Store as an array:`, Object.keys(req.sessionStore.sessions)); // All Active Session IDs as an array
   console.log(`===>>> \"Object.values(req.sessionStore.sessions)\" - All Values related to Active Session IDs as an array:`, Object.values(req.sessionStore.sessions)); // All Values related to Active Session IDs as an array
   
-  console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
-  console.log(`===>>> \"JSON.parse(Object.values(req.sessionStore.sessions)[0])\" - :`, JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport);
-  console.log(`===>>> \"JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport\" - :`, JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport);
-  console.log(`===>>> \"JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport.user\" - :`, JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport.user);
-  console.log("++++++++++++++++++++++++++++++++++++++++++++++++++");
+  // Example: Information about first session in the Session Store: Object.values(req.sessionStore.sessions)[0]
+  console.log(`${os.EOL}===>>> \"JSON.parse(Object.values(req.sessionStore.sessions)[0])\":`, JSON.parse(Object.values(req.sessionStore.sessions)[0]));
+  console.log(`===>>> \"JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport\":`, JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport);
+  console.log(`===>>> \"JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport.user\":`, JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport.user);
 
-
-  // Admin:
+  // Extract Admin's first name from Admin's full name
   const adminFirstName = req.user.name.split(" ")[0];
 
-  console.log(`${os.EOL}===>>> \"req.user\" - All information about Admin in the database:`, req.user); // All info about Admin in the database
+  // Information about Admin
+  console.log(`${os.EOL}===>>> \"req.user\" - All information about Admin in the database:`, req.user); // All information about Admin in the database
   console.log(`===>>> \"req.session\" - All information about Admin's session:`, req.session); // All information about Admin's session
   console.log(`===>>> \"Object.keys(req.session)\" - [ cookie, passport ]'s Admin:`, Object.keys(req.session)); // [ cookie, passport ]'s' Admin
   console.log(`===>>> \"Object.values(req.session)\" - All Values related to [ cookie, passport ]'s Admin:`, Object.values(req.session)); // All Values related to [ cookie, passport ]'s Admin
   console.log(`===>>> \"req.session.id\" - Admin's Session ID:`, req.session.id); // Admin's Session ID 
 
-
-  res.render("admin", { adminData: req.user, adminFirstName: adminFirstName, adminSessionId: req.session.id, activeSessionIds, iDs });
+  res.render("admin", { adminData: req.user, adminFirstName, adminSessionId: req.session.id, activeSessionIds, iDs });
 });
 
 // Revoke a session
@@ -93,14 +90,14 @@ router.get("/revoke", isAdmin, (req, res) => {
   
   const thisSId = req.query.sid;
 
-  console.log("This sid is deleted: ", thisSId);
+  console.log(`${os.EOL}===>>> This sid is deleted:`, thisSId);
 
   req.sessionStore.destroy(thisSId, (err) => {
 
     // callback function. If an error occurs, it will be accessible here.
     if(err)
     {
-      return console.error(err)
+      return console.error(err);
     }
     
     res.redirect("admin");

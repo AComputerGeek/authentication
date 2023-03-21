@@ -38,7 +38,9 @@ const githubLogin = new GitHubStrategy({
     let githubId = Number(profile.id);
     let name     = profile.displayName;
 
-    console.log(profile);
+    // If login with GitHub was successful, 
+    // "profile" is an object (contains all information about that user) that sent by GitHub to the Server 
+    console.log("Profile: ", profile);
 
     const user = userController.getUserByGithubId(githubId, name);
     

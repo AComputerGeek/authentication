@@ -17,41 +17,39 @@ router.get("/login", forwardAuthenticated, (req, res) => {
 
 // Step 2:
 // URL: "localhost:8000/auth/login"
+//
+// Local Login:
 // When we click the "Login" button in the login page, 
 // and username and password were valid, then we are going to go step 3 and 4.
 //
 // NOTE: "passport.authenticate" sends email(username) and password to the Strategy (passport.js file)
-router.post("/login", passport.authenticate("local", { failureRedirect: "/login" }),
-  (req, res) => {
+router.post("/login", passport.authenticate("local", { failureRedirect: "/login" }), (req, res) => {
+
     if(req.user.role === "admin")
     {
       res.redirect("/admin");
     }
     else
     {
-    res.redirect("/dashboard");
+      res.redirect("/dashboard");
     }
   }
 );
 
-// GitHub:
+// GitHub Login:
 // When we clicked the "Login with GitHub" button, this code is going to be executed
-router.get("/github",
-  // Means use github strategy
-  passport.authenticate("github")
-);
+router.get("/github", passport.authenticate("github"));
 
 // When GitHub sends the result of user's attempt for login, this code is going to be executed
-router.get("/github/callback",
-  passport.authenticate("github", { failureRedirect: "/login" }),
-  (req, res) => {
+router.get("/github/callback", passport.authenticate("github", { failureRedirect: "/login" }), (req, res) => {
+
     if(req.user.role === "admin")
     {
       res.redirect("/admin");
     }
     else
     {
-    res.redirect("/dashboard");
+      res.redirect("/dashboard");
     }
   }
 );

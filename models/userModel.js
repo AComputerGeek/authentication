@@ -26,7 +26,7 @@ const database = [
   },
   {
     id: 4,
-    name: "Amir",
+    name: "Amir Armion",
     email: "AArmion@SAP.com",
     password: "a123",
     role: "admin"
@@ -69,7 +69,7 @@ const userModel = {
 
     if(!user)
     {
-      database.push({id: githubId, name: name, role: "user"});
+      database.push({ id: githubId, name: name, role: "user" });
       const newUser = database.find((user) => user.id == githubId);
       
       return newUser;
